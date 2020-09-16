@@ -3,7 +3,7 @@ package com.codegym.service.serviceImpl;
 import com.codegym.dao.model.CustomUserDetails;
 import com.codegym.dao.model.Role;
 import com.codegym.dao.model.User;
-import com.codegym.dao.repository.UserRepository;
+import com.codegym.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,17 +17,19 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
-public class UserDetailsServiceimpl implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
+
+    UserService userService;
+
     @Autowired
-    UserRepository userRepository;
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email);
-//                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with email: " + email));
-//
-//        return UserDetailsImpl.build(user);
+        User user = userService.findByEmail(email);
         if (user == null) {
             throw new UsernameNotFoundException("User not found with email: " + email);
         }

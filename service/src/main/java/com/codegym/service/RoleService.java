@@ -1,7 +1,9 @@
 package com.codegym.service;
 
+import com.codegym.dao.model.ERole;
 import com.codegym.dao.model.Role;
 import org.springframework.security.access.prepost.PreAuthorize;
+
 
 public interface RoleService {
     Iterable<Role> findAll();
@@ -13,4 +15,6 @@ public interface RoleService {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     void deleteById(Long id);
+
+    Role findByRoleName(ERole roleUser);
 }

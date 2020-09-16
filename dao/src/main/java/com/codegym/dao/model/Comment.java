@@ -2,7 +2,6 @@ package com.codegym.dao.model;
 
 import com.codegym.dao.model.audit.DateAudit;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;

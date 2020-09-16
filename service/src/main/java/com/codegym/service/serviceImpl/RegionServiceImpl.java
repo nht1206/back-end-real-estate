@@ -1,6 +1,5 @@
 package com.codegym.service.serviceImpl;
 
-import com.codegym.dao.model.PostType;
 import com.codegym.dao.model.Region;
 import com.codegym.dao.repository.RegionRepository;
 import com.codegym.service.RegionService;

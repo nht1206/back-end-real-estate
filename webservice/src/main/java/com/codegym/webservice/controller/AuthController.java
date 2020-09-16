@@ -5,7 +5,7 @@ import com.codegym.configuration.security.JwtUtils;
 import com.codegym.dao.model.ERole;
 import com.codegym.dao.model.Role;
 import com.codegym.dao.model.User;
-import com.codegym.dao.repository.RoleRepository;
+import com.codegym.service.RoleService;
 import com.codegym.service.UserService;
 import com.codegym.dao.model.CustomUserDetails;
 import com.codegym.webservice.payload.response.ApiResponse;
@@ -33,20 +33,40 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
-    @Autowired
     AuthenticationManager authenticationManager;
 
-    @Autowired
     UserService userService;
 
-    @Autowired
-    RoleRepository roleRepository;
+    RoleService roleService;
 
-    @Autowired
     PasswordEncoder encoder;
 
-    @Autowired
     JwtUtils jwtUtils;
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setRoleService(RoleService roleService) {
+        this.roleService = roleService;
+    }
+
+    @Autowired
+    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
+    }
+
+    @Autowired
+    public void setEncoder(PasswordEncoder encoder) {
+        this.encoder = encoder;
+    }
+
+    @Autowired
+    public void setJwtUtils(JwtUtils jwtUtils) {
+        this.jwtUtils = jwtUtils;
+    }
 
     @PostMapping("/signin")
     public ResponseEntity<Object> authenticateUser(@Valid @RequestBody SignInRequest signInRequest) {
@@ -59,7 +79,7 @@ public class AuthController {
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Set<Role> roles = userDetails.getAuthorities().stream()
-                .map(item -> roleRepository.findByRoleName(ERole.valueOf(item.getAuthority())).get())
+                .map(item -> roleService.findByRoleName(ERole.valueOf(item.getAuthority())))
                 .collect(Collectors.toSet());
 
         return ResponseEntity.ok(new JwtResponse(jwt,
@@ -88,21 +108,27 @@ public class AuthController {
         Set<Role> roles = new HashSet<>();
 
         if (strRoles == null) {
-            Role userRole = roleRepository.findByRoleName(ERole.ROLE_USER)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+            Role userRole = roleService.findByRoleName(ERole.ROLE_USER);
+            if (userRole == null) {
+                throw new RuntimeException("Error: Role is not found.");
+            }
             roles.add(userRole);
         } else {
             strRoles.forEach(role -> {
                 switch (role) {
                     case "admin":
-                        Role adminRole = roleRepository.findByRoleName(ERole.ROLE_ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        Role adminRole = roleService.findByRoleName(ERole.ROLE_ADMIN);
+                        if (adminRole == null) {
+                            throw new RuntimeException("Error: Role is not found.");
+                        }
                         roles.add(adminRole);
 
                         break;
                     default:
-                        Role userRole = roleRepository.findByRoleName(ERole.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        Role userRole = roleService.findByRoleName(ERole.ROLE_USER);
+                        if (userRole == null) {
+                            throw new RuntimeException("Error: Role is not found.");
+                        }
                         roles.add(userRole);
                 }
             });

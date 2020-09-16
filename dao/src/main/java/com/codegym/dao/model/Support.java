@@ -3,7 +3,6 @@ package com.codegym.dao.model;
 import com.codegym.dao.model.audit.DateAudit;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity
 @Table(name = "support")

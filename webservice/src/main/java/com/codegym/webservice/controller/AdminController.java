@@ -4,12 +4,11 @@ package com.codegym.webservice.controller;
 import com.codegym.dao.model.ERole;
 import com.codegym.dao.model.Role;
 import com.codegym.dao.model.User;
-import com.codegym.dao.repository.RoleRepository;
+import com.codegym.service.RoleService;
 import com.codegym.service.UserService;
 import com.codegym.webservice.payload.request.AdminAccountRequest;
 import com.codegym.webservice.payload.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -32,8 +31,13 @@ public class AdminController {
         this.userService = userService;
     }
 
+
+    RoleService roleService;
+
     @Autowired
-    RoleRepository roleRepository;
+    public void setRoleService(RoleService roleService) {
+        this.roleService = roleService;
+    }
 
     @Autowired
     PasswordEncoder encoder;
@@ -72,7 +76,7 @@ public class AdminController {
         user.setPhoneNumber("");
         user.setPassword(encoder.encode(DEFAULT_PASSWORD));
         Set<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findByRoleName(ERole.ROLE_USER).get());
+        roles.add(roleService.findByRoleName(ERole.ROLE_USER));
         roles.add(adminAccountRequest.getRole());
         user.setRoles(roles);
         userService.save(user);

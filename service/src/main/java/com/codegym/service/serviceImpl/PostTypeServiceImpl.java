@@ -1,6 +1,5 @@
 package com.codegym.service.serviceImpl;
 
-import com.codegym.dao.model.Category;
 import com.codegym.dao.model.PostType;
 import com.codegym.dao.repository.PostTypeRepository;
 import com.codegym.service.PostTypeService;

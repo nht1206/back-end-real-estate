@@ -1,10 +1,13 @@
 package com.codegym.service.serviceImpl;
 
+import com.codegym.dao.model.ERole;
 import com.codegym.dao.model.Role;
 import com.codegym.dao.repository.RoleRepository;
 import com.codegym.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class RoleServiceImpl implements RoleService {
@@ -34,5 +37,10 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public void deleteById(Long id) {
         roleRepository.deleteById(id);
+    }
+
+    @Override
+    public Role findByRoleName(ERole roleName) {
+        return roleRepository.findByRoleName(roleName).get();
     }
 }

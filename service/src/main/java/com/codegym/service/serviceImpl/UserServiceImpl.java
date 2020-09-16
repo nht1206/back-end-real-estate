@@ -1,7 +1,6 @@
 package com.codegym.service.serviceImpl;
 
 import com.codegym.dao.model.AccountReport;
-import com.codegym.dao.model.ERole;
 import com.codegym.dao.model.User;
 import com.codegym.dao.repository.UserRepository;
 import com.codegym.service.UserService;
