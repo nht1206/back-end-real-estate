@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Arrays;
 import java.util.List;
@@ -96,6 +95,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void updatePostViewCount(Post post) {
+        post.setViewCount(post.getViewCount() + 1);
         postRepository.save(post);
     }
 

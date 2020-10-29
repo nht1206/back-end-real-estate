@@ -7,7 +7,6 @@ import com.codegym.dao.model.Role;
 import com.codegym.dao.model.User;
 import com.codegym.service.RoleService;
 import com.codegym.service.UserService;
-import com.codegym.dao.model.CustomUserDetails;
 import com.codegym.webservice.payload.response.ApiResponse;
 import com.codegym.webservice.payload.request.SignInRequest;
 import com.codegym.webservice.payload.request.SignUpRequest;
@@ -77,16 +76,7 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken((UserDetails) authentication.getPrincipal());
 
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Set<Role> roles = userDetails.getAuthorities().stream()
-                .map(item -> roleService.findByRoleName(ERole.valueOf(item.getAuthority())))
-                .collect(Collectors.toSet());
-
-        return ResponseEntity.ok(new JwtResponse(jwt,
-                userDetails.getId(),
-                userDetails.getEmail(),
-                userDetails.getName(),
-                roles));
+        return ResponseEntity.ok(new JwtResponse(jwt));
     }
 
     @PostMapping("/signup")

@@ -15,6 +15,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -80,7 +82,8 @@ public class PostController {
 
     //-------------------Update a Post by id--------------------------------------------------------
     @PatchMapping(value = "/{id}")
-    public ResponseEntity<Object> updatePost(@PathVariable Long id, @Valid @RequestBody Post post) {
+    @PreAuthorize("post.user.email == userDetails.username")
+    public ResponseEntity<Object> updatePost(@PathVariable Long id, @Valid @RequestBody Post post, @AuthenticationPrincipal UserDetails userDetails) {
         post.setId(id);
         if (postService.findById(id) == null) {
             return new ResponseEntity<>(new ApiResponse(false, "Can not find this post!"), HttpStatus.NOT_FOUND);
