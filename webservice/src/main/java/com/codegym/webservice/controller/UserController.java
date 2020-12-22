@@ -17,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -62,6 +64,7 @@ public class UserController {
 
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> findUserById(@PathVariable("id") Long id) {
         User user = userService.findById(id);
         if (user == null) {
@@ -87,8 +90,8 @@ public class UserController {
     //-------------------Update User Profile--------------------------------------------------------
 
     @PatchMapping(value = "/{id}")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Object> updateUser(@PathVariable Long id, @RequestBody User user) {
+    @PreAuthorize("#user.getEmail() == #userDetails.getUsername()")
+    public ResponseEntity<Object> updateUser(@PathVariable Long id, @RequestBody User user, @AuthenticationPrincipal UserDetails userDetails) {
         User currentUser = userService.findById(id);
 
         if (currentUser == null) {

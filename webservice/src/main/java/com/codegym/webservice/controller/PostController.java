@@ -82,7 +82,7 @@ public class PostController {
 
     //-------------------Update a Post by id--------------------------------------------------------
     @PatchMapping(value = "/{id}")
-    @PreAuthorize("post.user.email == userDetails.username")
+    @PreAuthorize("#post.getUser().getEmail() == #userDetails.getUsername()")
     public ResponseEntity<Object> updatePost(@PathVariable Long id, @Valid @RequestBody Post post, @AuthenticationPrincipal UserDetails userDetails) {
         post.setId(id);
         if (postService.findById(id) == null) {

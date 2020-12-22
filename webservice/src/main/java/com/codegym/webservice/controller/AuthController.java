@@ -84,7 +84,7 @@ public class AuthController {
         if (userService.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponse("Error: Email is already taken!"));
+                    .body(new MessageResponse("Email đã được đăng ký, vui lòng sử dụng email khác!"));
         }
 
         // Create new user's account
@@ -117,7 +117,7 @@ public class AuthController {
                     default:
                         Role userRole = roleService.findByRoleName(ERole.ROLE_USER);
                         if (userRole == null) {
-                            throw new RuntimeException("Error: Role is not found.");
+                            throw new RuntimeException("Quyền user không tìm thấy!");
                         }
                         roles.add(userRole);
                 }
@@ -127,7 +127,7 @@ public class AuthController {
         user.setRoles(roles);
         userService.save(user);
 
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        return ResponseEntity.ok(new MessageResponse("Đăng ký thành công!"));
     }
 
 

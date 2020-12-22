@@ -43,7 +43,7 @@ public class Post extends DateAudit {
 
     @Column
     @Min(0)
-    private Long viewCount;
+    private Long viewCount = 0L;
 
     @Column(columnDefinition = "TEXT")
     @NotBlank
