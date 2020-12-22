@@ -82,7 +82,7 @@ public class PostController {
 
     //-------------------Update a Post by id--------------------------------------------------------
     @PatchMapping(value = "/{id}")
-    @PreAuthorize("hasRole('ROLE_USER') && (#post.getUser().getEmail() == #userDetails.getUsername())")
+    @PreAuthorize("hasRole('ROLE_ADMIN') || (hasRole('ROLE_USER') && (@postServiceImpl.findById(#id).getUser().getEmail() == #userDetails.getUsername()))")
     public ResponseEntity<Object> updatePost(@PathVariable Long id, @Valid @RequestBody Post post, @AuthenticationPrincipal UserDetails userDetails) {
         post.setId(id);
         if (postService.findById(id) == null) {
@@ -99,7 +99,7 @@ public class PostController {
 
     //-------------------Delete a Post by id--------------------------------------------------------
     @DeleteMapping(value = "/{id}")
-    @PreAuthorize("hasRole('ROLE_USER') && (@postServiceImpl.findById(#id).getUser().getEmail() == #userDetails.getUsername())")
+    @PreAuthorize("hasRole('ROLE_ADMIN') || (hasRole('ROLE_USER') && (@postServiceImpl.findById(#id).getUser().getEmail() == #userDetails.getUsername()))")
     public ResponseEntity<Object> deletePost(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         Post post = postService.findById(id);
         if (post == null){
