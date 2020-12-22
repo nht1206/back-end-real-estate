@@ -58,9 +58,10 @@ public class PostController {
 
     //-------------------Get One Post By Id--------------------------------------------------------
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Object> findPostById(@PathVariable Long id) {
+    @PreAuthorize("@postServiceImpl.findById(#id).isStatus() || (@postServiceImpl.findById(#id).getUser().getEmail() == #userDetails.getUsername())")
+    public ResponseEntity<Object> findPostById(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         Post post = postService.findById(id);
-        if (post == null) {
+        if (post == null || !post.isApproved()) {
             return new ResponseEntity<>(new ApiResponse(false, "Can not find this post!"), HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(post, HttpStatus.OK);
@@ -70,7 +71,7 @@ public class PostController {
     //-------------------Create a Post--------------------------------------------------------
     @PostMapping
     @PreAuthorize("hasRole('ROLE_USER') && (#post.getUser().getEmail() == #userDetails.getUsername())")
-    public ResponseEntity<Object> createPost(@RequestBody Post post) {
+    public ResponseEntity<Object> createPost(@RequestBody Post post, @AuthenticationPrincipal UserDetails userDetails) {
         postService.save(post);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
