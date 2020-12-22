@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -24,11 +26,13 @@ public class CommentController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> findAllComments(Pageable pageable) {
         return new ResponseEntity<>(commentService.findAll(pageable), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Object> findCommentById(@PathVariable Long id) {
         Comment comment = commentService.findById(id);
         if (comment == null) {
@@ -39,13 +43,14 @@ public class CommentController {
     }
 
     @GetMapping(value = "/{id}/post")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Object> findCommentByPostId(@PathVariable Long id, Pageable pageable) {
         return new ResponseEntity<>(commentService.findByPostId(id, pageable), HttpStatus.OK);
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Object> createComment(@RequestBody Comment comment) {
+    @PreAuthorize("hasRole('ROLE_USER') && (#comment.getUser().getEmail() == #userDetails.getUsername())")
+    public ResponseEntity<Object> createComment(@RequestBody Comment comment, @AuthenticationPrincipal UserDetails userDetails) {
         commentService.save(comment);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -56,8 +61,8 @@ public class CommentController {
     }
 
     @PatchMapping(value = "/{id}")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Object> updateComment(@PathVariable Long id, @RequestBody Comment comment) {
+    @PreAuthorize("hasRole('ROLE_ADMIN') || (#comment.getUser().getEmail() == #userDetails.getUsername())")
+    public ResponseEntity<Object> updateComment(@PathVariable Long id, @RequestBody Comment comment, @AuthenticationPrincipal UserDetails userDetails) {
         comment.setId(id);
         if (commentService.findById(id) == null) {
             return new ResponseEntity<>(new ApiResponse(false, "Can not find this comment!"), HttpStatus.NOT_FOUND);
@@ -72,8 +77,8 @@ public class CommentController {
     }
 
     @DeleteMapping(value = "/{id}")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Object> deleteComment(@PathVariable Long id) {
+    @PreAuthorize("hasRole('ROLE_ADMIN') || (@commentServiceImpl.findById(#id).getUser().getEmail() == #userDetails.getUsername())")
+    public ResponseEntity<Object> deleteComment(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         commentService.deleteById(id);
         return new ResponseEntity<>(new ApiResponse(true, "Delete repository successfully!"), HttpStatus.OK);
     }

@@ -47,8 +47,8 @@ public class PostController {
 
     //-------------------Get Posts By UserId--------------------------------------------------------
     @GetMapping(value = "/user/{userId}")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Object> findPostsByUserId(@PageableDefault(value = 5) Pageable pageable, @PathVariable Long userId) {
+    @PreAuthorize("hasRole('ROLE_ADMIN') || (hasRole('ROLE_USER') && (#userId == @userServiceImpl.findByEmail(#userDetails.getUsername())))")
+    public ResponseEntity<Object> findPostsByUserId(@PageableDefault(value = 5) Pageable pageable, @PathVariable Long userId, @AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.findById(userId);
         if (user == null) {
             return new ResponseEntity<>(new ApiResponse(false, "Can not find user!"), HttpStatus.NOT_FOUND);
@@ -69,7 +69,7 @@ public class PostController {
 
     //-------------------Create a Post--------------------------------------------------------
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER') && (#post.getUser().getEmail() == #userDetails.getUsername())")
     public ResponseEntity<Object> createPost(@RequestBody Post post) {
         postService.save(post);
         URI location = ServletUriComponentsBuilder
@@ -82,7 +82,7 @@ public class PostController {
 
     //-------------------Update a Post by id--------------------------------------------------------
     @PatchMapping(value = "/{id}")
-    @PreAuthorize("#post.getUser().getEmail() == #userDetails.getUsername()")
+    @PreAuthorize("hasRole('ROLE_USER') && (#post.getUser().getEmail() == #userDetails.getUsername())")
     public ResponseEntity<Object> updatePost(@PathVariable Long id, @Valid @RequestBody Post post, @AuthenticationPrincipal UserDetails userDetails) {
         post.setId(id);
         if (postService.findById(id) == null) {
