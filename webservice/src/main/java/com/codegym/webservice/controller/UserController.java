@@ -147,8 +147,15 @@ public class UserController {
     //-------------------Find Posts By UserId Pagination And Search--------------------------------------------------------
 
     @GetMapping("/{id}/posts")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Object> getPostsByUserId(@PathVariable("id") Long id, @PageableDefault(size = 5) Pageable pageable, @RequestParam("search") String search) {
+    @PreAuthorize("hasRole('ROLE_ADMIN') " +
+            "|| (hasRole('ROLE_USER') " +
+            "&& (@userServiceImpl.findById(#id).getEmail() == #userDetails.getUsername()))")
+    public ResponseEntity<Object> getPostsByUserId(
+            @PathVariable("id") Long id,
+            @PageableDefault(size = 5) Pageable pageable,
+            @RequestParam(name = "search", required = false) String search,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
         Page<Post> posts;
         User user = userService.findById(id);
         if (user == null) {

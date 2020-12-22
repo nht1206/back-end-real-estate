@@ -95,7 +95,9 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void updatePostViewCount(Post post) {
-        post.setViewCount(post.getViewCount() + 1);
+        if (post.isApproved()) {
+            post.setViewCount(post.getViewCount() + 1);
+        }
         postRepository.save(post);
     }
 

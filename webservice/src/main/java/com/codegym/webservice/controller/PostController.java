@@ -58,10 +58,10 @@ public class PostController {
 
     //-------------------Get One Post By Id--------------------------------------------------------
     @GetMapping(value = "/{id}")
-    @PreAuthorize("@postServiceImpl.findById(#id).isStatus() || (@postServiceImpl.findById(#id).getUser().getEmail() == #userDetails.getUsername())")
+    @PreAuthorize("@postServiceImpl.findById(#id).isApproved() || (@postServiceImpl.findById(#id).getUser().getEmail() == #userDetails.getUsername())")
     public ResponseEntity<Object> findPostById(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         Post post = postService.findById(id);
-        if (post == null || !post.isApproved()) {
+        if (post == null || !post.isStatus()) {
             return new ResponseEntity<>(new ApiResponse(false, "Can not find this post!"), HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(post, HttpStatus.OK);
