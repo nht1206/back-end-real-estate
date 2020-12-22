@@ -99,8 +99,8 @@ public class PostController {
 
     //-------------------Delete a Post by id--------------------------------------------------------
     @DeleteMapping(value = "/{id}")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Object> deletePost(@PathVariable Long id) {
+    @PreAuthorize("hasRole('ROLE_USER') && (@postServiceImpl.findById(#id).getUser().getEmail() == #userDetails.getUsername())")
+    public ResponseEntity<Object> deletePost(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         Post post = postService.findById(id);
         if (post == null){
             return new ResponseEntity<>(new ApiResponse(false, "Can not find post!"), HttpStatus.NOT_FOUND);
